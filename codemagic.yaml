@@ -1,19 +1,37 @@
+
 workflows:
-  Workflow:
-    name: Workflow
-    instance_type: mac_mini
-    environment:
-    cache:
-      cache_paths:
-        - ~/.pub-cache
-      branch_patterns:
-        - pattern: '*'
-          include: true
-          source: true
-      cancel_previous_builds: false
-    scripts:
-      - ./gradle assembleRelease
-    artifacts:
-      - build/**/outputs/bundle/**/*.apk
-      scripts:
-        - echo 'Post-publish script'
+    native-android:
+        name: Native Android
+        environment:
+            vars:
+                # Set up paths to application binary and test package 
+                AWS_APK_PATH: "$FCI_BUILD_DIR/app/build/outputs/apk/debug/app-debug.apk"
+                AWS_TEST_APK_PATH: "$FCI_BUILD_DIR/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+                # Specify application and test types
+                AWS_APP_TYPE: "ANDROID_APP" # Type of the main app that is being tested. See more about `--type` flag at https://docs.aws.amazon.com/cli/latest/reference/devicefarm/create-upload.html
+                AWS_TEST_PACKAGE_TYPE: "INSTRUMENTATION_TEST_PACKAGE" # Type of the test package that is being uploaded. See more about `--type` flag at https://docs.aws.amazon.com/cli/latest/reference/devicefarm/create-upload.html
+                AWS_TEST_TYPE: "INSTRUMENTATION" # See more about `--test` flag `type` option at https://docs.aws.amazon.com/cli/latest/reference/devicefarm/schedule-run.html  
+            node: latest
+            xcode: 12.2
+        triggering:
+            events:
+                - push
+                - tag
+                - pull_request
+            branch_patterns:
+                - pattern: develop
+                  include: true
+                  source: true
+        scripts:
+            - name: Set Android SDK location
+              script: |
+                echo "sdk.dir=$ANDROID_SDK_ROOT" > "$FCI_BUILD_DIR/local.properties"
+            - name: Build Android test APK
+              script: |
+                ./gradlew assembleAndroidTesT
+            - name: Build Android production release
+              script: |
+                ./gradlew assembleRelease    
+        artifacts:
+            - app/build/outputs/**/*.apk  
+          
