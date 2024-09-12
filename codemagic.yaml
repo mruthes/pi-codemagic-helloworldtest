@@ -2,7 +2,7 @@ workflows:
   android-workflow:
     name: Build Console APK for Android
     max_build_duration: 20
-    instance_type: linux   # Alterado para 'linux'
+    instance_type: macos_m2   # Alterado para 'macos_m2'
     environment:
       vars:
         ANDROID_BUILD: true
