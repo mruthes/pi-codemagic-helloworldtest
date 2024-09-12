@@ -2,13 +2,31 @@ workflows:
   android-workflow:
     name: Build Console APK for Android
     max_build_duration: 20
-    instance_type: mac_mini_m2   
+    instance_type: mac_mini_m2
     environment:
       vars:
         ANDROID_BUILD: true
     scripts:
       - name: Build Android Console APK
         script: |
+          chmod +x gradlew
           ./gradlew assembleDebug
     artifacts:
-      - build/app/outputs/apk/debug/app-debug.apk
+      - app/build/outputs/apk/debug/app-debug.apk
+
+
+
+# workflows:
+#   android-workflow:
+#     name: Build Console APK for Android
+#     max_build_duration: 20
+#     instance_type: mac_mini_m2   
+#     environment:
+#       vars:
+#         ANDROID_BUILD: true
+#     scripts:
+#       - name: Build Android Console APK
+#         script: |
+#           ./gradlew assembleDebug
+#     artifacts:
+#       - build/app/outputs/apk/debug/app-debug.apk
